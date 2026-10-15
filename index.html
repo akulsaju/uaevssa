@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0b1117">
+    <meta name="description" content="A data residency compliance dashboard for cloud data flows.">
+    <title>Boundary — Residency Control Plane</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <div id="boot-screen" class="boot-screen" role="status"><span class="boot-spinner"></span><span>Connecting to your secure workspace...</span></div>
+    <main id="auth-screen" class="auth-screen" hidden>
+      <section class="auth-card" aria-labelledby="auth-title">
+        <a class="brand auth-brand" href="/" aria-label="Boundary home">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          <span>boundary<span class="brand-period">.</span></span>
+        </a>
+        <div class="auth-eyebrow">DATA RESIDENCY CONTROL PLANE</div>
+        <h1 id="auth-title">Create your workspace</h1>
+        <p id="auth-description" class="auth-description">Create an account to start a private data-flow inventory.</p>
+        <div id="auth-setup-message" class="auth-message auth-message-error" role="alert" hidden>Supabase is not configured. Set <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_PUBLISHABLE_KEY</code> in <code>.env.local</code>.</div>
+        <section id="email-verification" class="email-verification" aria-live="polite" hidden>
+          <span class="verification-icon" aria-hidden="true">✉</span>
+          <h2>Check your inbox</h2>
+          <p>We sent a confirmation link to <strong id="verification-email"></strong>. Open the email and confirm your address to activate your account.</p>
+          <p class="verification-hint">No email yet? Check your spam folder or resend the confirmation link.</p>
+          <p id="verification-feedback" class="auth-feedback" role="status" aria-live="polite"></p>
+          <button id="resend-verification" class="button button-primary auth-submit" type="button">Resend confirmation email</button>
+          <button id="change-verification-email" class="auth-back-link" type="button">Use a different email</button>
+        </section>
+        <form id="auth-form" novalidate>
+          <label id="name-field" class="auth-field" hidden>Full name<input id="full-name" name="fullName" type="text" autocomplete="name" maxlength="80"></label>
+          <label id="workspace-field" class="auth-field" hidden>Workspace name<input id="workspace-name" name="workspaceName" type="text" autocomplete="organization" maxlength="80"></label>
+          <label class="auth-field">Work email or demo username<input id="email" name="email" type="email" autocomplete="username" required maxlength="254" placeholder="you@company.com or demo"></label>
+          <label class="auth-field">Password<input id="password" name="password" type="password" autocomplete="current-password" required minlength="8" placeholder="At least 8 characters"></label>
+          <label id="confirm-password-field" class="auth-field" hidden>Confirm new password<input id="confirm-password" name="confirmPassword" type="password" autocomplete="new-password" minlength="8"></label>
+          <button id="forgot-password" class="auth-forgot" type="button">Forgot password?</button>
+          <p id="auth-feedback" class="auth-feedback" role="status" aria-live="polite"></p>
+          <button id="auth-submit" class="button button-primary auth-submit" type="submit">Sign in</button>
+        </form>
+        <p id="auth-switch" class="auth-switch"><span id="auth-switch-copy">New to Boundary?</span> <button id="auth-mode-toggle" type="button">Create an account</button></p>
+        <button id="demo-login-button" class="button button-secondary demo-login-button" type="button">Open read-only demo</button>
+        <p class="demo-login-hint">Explore with the read-only demo: <code>demo</code> / <code>12345</code></p>
+        <p id="auth-security" class="auth-security"><span aria-hidden="true">⌑</span> Protected by Supabase Auth · Your password is never stored by Boundary</p>
+        <p class="made-with-love made-with-love-auth">Made with <span aria-label="love">♥</span> by @akul &amp; @saiqua</p>
+      </section>
+    </main>
+
+    <div id="app-shell" class="app-shell" hidden>
+      <aside class="sidebar" aria-label="Main navigation">
+        <a class="brand" href="#dashboard" aria-label="Boundary home">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          <span>boundary<span class="brand-period">.</span></span>
+        </a>
+
+        <div class="workspace-picker">
+          <span class="workspace-icon">N</span>
+          <span class="workspace-copy"><strong id="workspace-label">Workspace</strong><small>Private workspace</small></span>
+          <span class="chevron" aria-hidden="true">⌄</span>
+        </div>
+
+        <div class="nav-label">WORKSPACE</div>
+        <nav class="nav-links">
+          <a class="nav-link active" href="#dashboard" aria-current="page"><span class="nav-icon">▦</span>Overview</a>
+          <a class="nav-link" href="#flows"><span class="nav-icon">⌁</span>Data flows<span id="flow-count-badge" class="nav-count">0</span></a>
+          <button class="nav-link" type="button" data-scroll="findings"><span class="nav-icon">◇</span>Findings</button>
+          <button class="nav-link" type="button" data-scroll="cloud-discovery"><span class="nav-icon">☁</span>Cloud accounts</button>
+        </nav>
+
+        <div class="nav-label nav-label-lower">MANAGE</div>
+        <nav class="nav-links">
+          <button class="nav-link" id="cloud-connect-open" type="button"><span class="nav-icon">⊞</span>Integrations</button>
+          <button class="nav-link" id="workspace-settings-open" type="button"><span class="nav-icon">⚙</span>Settings</button>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <div class="plan-card">
+            <div class="plan-top"><span class="plan-spark">✦</span><span>MANUAL INVENTORY</span></div>
+            <strong>Track data transfers</strong>
+            <p>Connect read-only cloud accounts to discover resources on demand.</p>
+            <a href="#cloud-discovery">Manage cloud accounts <span aria-hidden="true">→</span></a>
+          </div>
+          <button class="profile-button" id="signout-button" type="button" aria-label="Sign out">
+            <span class="avatar" id="user-avatar">?</span><span class="profile-copy"><strong id="user-name">Account</strong><small id="user-email">Signed in</small></span><span class="profile-menu">↪</span>
+          </button>
+        </div>
+      </aside>
+
+      <main id="dashboard" class="main-content">
+        <header class="topbar">
+          <div class="breadcrumbs"><span id="breadcrumb-workspace">Workspace</span><span class="crumb-slash">/</span><strong>Overview</strong></div>
+          <div class="topbar-actions">
+            <span id="demo-mode-badge" class="demo-mode-badge" hidden>READ-ONLY DEMO</span>
+            <span class="environment"><span class="environment-dot"></span>Private workspace</span>
+            <button class="icon-button help-button" id="tutorial-open" type="button" aria-label="Open onboarding tutorial">?</button>
+            <button class="top-avatar" id="top-avatar" type="button" aria-label="Sign out">?</button>
+          </div>
+        </header>
+        <div id="workspace-error" class="workspace-error" role="alert" hidden>
+          <span id="workspace-error-text">The workspace could not be loaded.</span>
+          <button id="retry-workspace" type="button">Try again</button>
+        </div>
+
+        <div class="page-wrap">
+          <div id="demo-banner" class="demo-banner" role="status" hidden><strong>Demo workspace</strong><span>Sample data only — changes are disabled and nothing is saved.</span></div>
+          <section class="page-heading">
+            <div>
+              <div class="eyebrow"><span class="eyebrow-line"></span>DATA RESIDENCY</div>
+              <h1 id="greeting">Your residency overview <span class="wave">✳</span></h1>
+              <p class="page-subtitle">Record and review sensitive data transfers in your workspace.</p>
+            </div>
+            <div class="heading-actions">
+              <span class="updated-label">Updated <span id="last-updated">just now</span></span>
+              <button class="button button-secondary" id="refresh-button" type="button"><span class="refresh-icon">↻</span> Refresh</button>
+              <button class="button button-primary" id="add-flow-button" type="button"><span aria-hidden="true">＋</span> Add data flow</button>
+            </div>
+          </section>
+
+          <div class="demo-notice">
+            <span class="notice-icon">i</span>
+            <span><strong>Residency rule active</strong> — PII, financial, and sensitive records crossing jurisdictions are flagged. Transfers are not blocked.</span>
+            <button type="button" class="notice-dismiss" aria-label="Dismiss notice">×</button>
+          </div>
+
+          <section id="overview-metrics" class="metrics" aria-label="Compliance summary">
+            <article class="metric-card">
+              <div class="metric-heading"><span>TRACKED DATA FLOWS</span><span class="metric-icon icon-cyan">⌁</span></div>
+              <div class="metric-value"><span id="total-flow-count">0</span></div>
+              <div class="metric-foot"><span>Saved in this workspace</span></div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-heading"><span>POLICY FINDINGS</span><span class="metric-icon icon-red">!</span></div>
+              <div class="metric-value"><span id="violation-count">0</span></div>
+              <div class="metric-foot"><span class="status-dot status-red"></span><span id="finding-summary">No flagged flows</span></div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-heading"><span>FLOWS MARKED COMPLIANT</span><span class="metric-icon icon-green">✓</span></div>
+              <div class="metric-value"><span id="compliance-score">—</span><span class="metric-unit">%</span></div>
+              <div class="metric-foot"><span class="score-track"><span id="compliance-bar"></span></span><span>Based on recorded status</span></div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-heading"><span>REGIONS TRACKED</span><span class="metric-icon icon-violet">◎</span></div>
+              <div class="metric-value"><span id="region-count">0</span></div>
+              <div class="metric-foot"><span id="provider-summary">No cloud providers recorded</span></div>
+            </article>
+          </section>
+
+          <section class="overview-grid" aria-label="Data flow summary">
+            <article class="panel map-panel">
+              <div class="panel-heading">
+                <div><h2>Jurisdiction inventory</h2><p>Jurisdictions referenced by your recorded flows</p></div>
+                <span class="inventory-label">USER-RECORDED</span>
+              </div>
+              <div id="region-inventory" class="region-inventory"></div>
+            </article>
+
+            <article id="findings" class="panel findings-panel">
+              <div class="panel-heading">
+                <div><h2>Needs attention <span id="finding-count" class="heading-count">0</span></h2><p>Flows recorded as violations or at risk</p></div>
+                <button class="more-button" type="button" id="filter-findings" aria-label="Show findings">↘</button>
+              </div>
+              <div id="finding-list" class="finding-list">
+                <div class="findings-empty">No flagged flows. Add an inventory record to get started.</div>
+              </div>
+              <button class="all-findings" id="show-violations" type="button">View flagged records <span>→</span></button>
+              <div class="policy-note"><span class="policy-note-icon">i</span><span><strong>Cross-jurisdiction rule</strong><small>Default policy; not a legal compliance determination</small></span></div>
+            </article>
+          </section>
+
+          <section id="cloud-discovery" class="panel cloud-discovery-panel">
+            <div class="flows-heading">
+              <div><h2>Cloud resource discovery</h2><p>Read-only, on-demand inventory from connected cloud accounts</p></div>
+              <button class="button button-primary" id="add-cloud-account" type="button"><span aria-hidden="true">＋</span> Connect account</button>
+            </div>
+            <div id="cloud-discovery-notice" class="cloud-discovery-notice">
+              Discovery reads resource configuration and regions only. It does not observe data transfers or network traffic.
+            </div>
+            <p id="cloud-discovery-error" class="form-error cloud-discovery-error" role="alert" hidden></p>
+            <div id="cloud-account-list" class="cloud-account-list"></div>
+            <div id="cloud-resource-empty" class="cloud-resource-empty">Connect a read-only cloud account to discover its resources.</div>
+            <div id="cloud-resource-table-wrap" class="table-wrap cloud-resource-table-wrap" hidden>
+              <table>
+                <thead><tr><th scope="col">RESOURCE</th><th scope="col">PROVIDER</th><th scope="col">REGION</th><th scope="col">JURISDICTION</th><th scope="col">CLASSIFICATION</th><th scope="col">LAST SEEN</th></tr></thead>
+                <tbody id="cloud-resource-table-body"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section id="flows" class="panel flows-panel">
+            <div class="flows-heading">
+              <div><h2>Data flow inventory</h2><p>Records stored securely in your workspace database</p></div>
+              <button class="button button-secondary export-button" id="export-button" type="button"><span aria-hidden="true">↓</span> Export</button>
+            </div>
+            <div class="table-toolbar">
+              <label class="search-box"><span aria-hidden="true">⌕</span><input id="search-input" type="search" placeholder="Search data flows..." autocomplete="off" aria-label="Search data flows"></label>
+              <div class="filter-group">
+                <label class="select-wrap"><span class="sr-only">Filter by status</span><select id="status-filter"><option value="all">All statuses</option><option value="violation">Violations</option><option value="at-risk">At risk</option><option value="compliant">Compliant</option></select><span aria-hidden="true">⌄</span></label>
+                <label class="select-wrap"><span class="sr-only">Filter by region</span><select id="region-filter"><option value="all">All regions</option><option value="EU West">EU West</option><option value="US East">US East</option><option value="UAE Central">UAE Central</option><option value="AP Southeast">AP Southeast</option></select><span aria-hidden="true">⌄</span></label>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th scope="col">DATA FLOW</th><th scope="col">SOURCE</th><th scope="col">DESTINATION</th><th scope="col">DATA CLASS</th><th scope="col">STATUS</th><th scope="col">LAST SEEN</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
+                <tbody id="flows-table-body"></tbody>
+              </table>
+              <div id="empty-state" class="empty-state" hidden><span>⌕</span><strong>No data flows yet</strong><p>Add a transfer record or change your filters.</p><button class="text-button" id="clear-filters" type="button">Clear filters</button></div>
+            </div>
+            <div class="table-footer"><span id="results-count">0 records</span><span class="pagination-button">Changes sync to this workspace</span></div>
+          </section>
+          <footer class="page-footer"><span><span class="footer-pulse"></span>Secure workspace connected</span><span>Boundary Residency Guard <span class="footer-version">manual inventory</span></span><span class="made-with-love">Made with <span aria-label="love">♥</span> by @akul &amp; @saiqua</span></footer>
+        </div>
+      </main>
+    </div>
+    <div id="cloud-account-backdrop" class="dialog-backdrop" hidden>
+      <section class="flow-dialog cloud-account-dialog" role="dialog" aria-modal="true" aria-labelledby="cloud-account-title">
+        <div class="dialog-header"><div><span class="dialog-kicker">READ-ONLY FEDERATION</span><h2 id="cloud-account-title">Connect a cloud account</h2></div><button id="close-cloud-account" class="icon-button close-dialog" type="button" aria-label="Close cloud account form">×</button></div>
+        <p class="cloud-setup-copy">Boundary exchanges your signed-in identity for temporary access. No cloud keys are stored. Set up the provider trust and read-only permissions below before scanning.</p>
+        <div class="editor-grid">
+          <label class="editor-field">Provider<select id="cloud-provider"><option value="AWS">Amazon Web Services</option><option value="Azure">Microsoft Azure</option><option value="GCP">Google Cloud</option></select></label>
+          <label class="editor-field">Account label<input id="cloud-display-name" required maxlength="80" placeholder="e.g. Production"></label>
+        </div>
+        <div id="cloud-provider-fields">
+          <div class="cloud-provider-fields" data-provider-fields="AWS">
+            <label class="editor-field">AWS account ID<input id="aws-account-id" inputmode="numeric" minlength="12" maxlength="12" pattern="[0-9]{12}" placeholder="12-digit account ID"></label>
+            <label class="editor-field">IAM role ARN<input id="aws-role-arn" placeholder="arn:aws:iam::123456789012:role/BoundaryReadOnly"></label>
+          </div>
+          <div class="cloud-provider-fields" data-provider-fields="Azure" hidden>
+            <label class="editor-field">Entra tenant ID<input id="azure-tenant-id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"></label>
+            <label class="editor-field">Application (client) ID<input id="azure-client-id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"></label>
+            <label class="editor-field editor-wide">Subscription ID<input id="azure-subscription-id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"></label>
+          </div>
+          <div class="cloud-provider-fields" data-provider-fields="GCP" hidden>
+            <label class="editor-field">Google Cloud project ID<input id="gcp-project-id" placeholder="my-project"></label>
+            <label class="editor-field">Project number<input id="gcp-project-number" inputmode="numeric" placeholder="123456789012"></label>
+            <label class="editor-field">Workload identity pool ID<input id="gcp-pool-id" placeholder="boundary-pool"></label>
+            <label class="editor-field">Workload identity provider ID<input id="gcp-provider-id" placeholder="boundary-provider"></label>
+            <label class="editor-field editor-wide">Read-only service account email<input id="gcp-service-account" type="email" placeholder="boundary-reader@my-project.iam.gserviceaccount.com"></label>
+          </div>
+        </div>
+        <details class="cloud-federation-guide" open>
+          <summary>Provider trust and read-only permission setup</summary>
+          <div id="cloud-federation-instructions" class="cloud-federation-instructions"></div>
+        </details>
+        <p id="cloud-account-error" class="form-error" role="alert"></p>
+        <div class="dialog-actions"><button id="cancel-cloud-account" class="button button-secondary" type="button">Cancel</button><button id="save-cloud-account" class="button button-primary" type="button">Save account</button></div>
+      </section>
+    </div>
+    <div id="workspace-settings-backdrop" class="dialog-backdrop" hidden>
+      <section class="flow-dialog settings-dialog" role="dialog" aria-modal="true" aria-labelledby="workspace-settings-title">
+        <div class="dialog-header"><div><span class="dialog-kicker">WORKSPACE SETTINGS</span><h2 id="workspace-settings-title">Workspace settings</h2></div><button id="close-workspace-settings" class="icon-button close-dialog" type="button" aria-label="Close settings">×</button></div>
+        <form id="workspace-settings-form">
+          <label class="editor-field">Workspace name<input id="settings-workspace-name" required maxlength="80"></label>
+          <p id="workspace-settings-error" class="form-error" role="alert"></p>
+          <div class="dialog-actions"><button id="cancel-workspace-settings" class="button button-secondary" type="button">Cancel</button><button id="save-workspace-settings" class="button button-primary" type="submit">Save settings</button></div>
+        </form>
+        <p class="settings-account-copy">Signed in as <strong id="settings-user-email"></strong>. Password and email controls are managed by Supabase Auth.</p>
+      </section>
+    </div>
+    <div id="flow-dialog" class="dialog-backdrop" hidden>
+      <section class="flow-dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+        <div class="dialog-header"><div><span class="dialog-kicker">FLOW INSPECTOR</span><h2 id="dialog-title">Data flow details</h2></div><button id="close-dialog" class="icon-button close-dialog" type="button" aria-label="Close details">×</button></div>
+        <div id="dialog-content"></div>
+        <div class="dialog-actions"><button id="delete-flow" class="button button-danger" type="button">Delete</button><button id="edit-flow" class="button button-secondary" type="button">Edit flow</button><button id="copy-flow" class="button button-secondary" type="button">Copy flow ID</button><button id="review-flow" class="button button-primary" type="button">Mark as reviewed</button></div>
+      </section>
+    </div>
+    <div id="flow-form-backdrop" class="dialog-backdrop" hidden>
+      <section class="flow-dialog editor-dialog" role="dialog" aria-modal="true" aria-labelledby="flow-form-title">
+        <div class="dialog-header"><div><span class="dialog-kicker">WORKSPACE INVENTORY</span><h2 id="flow-form-title">Add a data flow</h2></div><button id="close-flow-form" class="icon-button close-dialog" type="button" aria-label="Close form">×</button></div>
+        <form id="flow-form">
+          <div class="editor-grid">
+            <label class="editor-field editor-wide">Flow name<input id="flow-name" name="name" required maxlength="120" placeholder="e.g. Customer billing export"></label>
+            <label class="editor-field">Cloud provider<select id="flow-provider" name="provider" required><option value="AWS">AWS</option><option value="Azure">Azure</option><option value="GCP">Google Cloud</option><option value="Other">Other</option></select></label>
+            <label class="editor-field">Data classification<select id="flow-classification" name="classification" required><option value="PII">Personal data (PII)</option><option value="Financial">Financial records</option><option value="Sensitive">Sensitive</option><option value="Internal">Internal</option><option value="Public">Public</option></select></label>
+            <label class="editor-field">Source region<input id="flow-source" name="sourceRegion" required maxlength="120" placeholder="e.g. EU West"></label>
+            <label class="editor-field">Destination region<input id="flow-destination" name="destinationRegion" required maxlength="120" placeholder="e.g. US East"></label>
+            <label class="editor-field">Source jurisdiction<input id="flow-source-jurisdiction" name="sourceJurisdiction" required minlength="2" maxlength="2" pattern="[A-Za-z]{2}" placeholder="e.g. DE, AE, US" title="Enter a two-letter jurisdiction code"></label>
+            <label class="editor-field">Destination jurisdiction<input id="flow-destination-jurisdiction" name="destinationJurisdiction" required minlength="2" maxlength="2" pattern="[A-Za-z]{2}" placeholder="e.g. DE, AE, US" title="Enter a two-letter jurisdiction code"></label>
+            <label class="editor-field">Additional review status<select id="flow-status" name="manualStatus" required><option value="compliant">No additional finding</option><option value="at-risk">At risk — needs review</option></select></label>
+            <label class="editor-field">Policy name<input id="flow-policy" name="policyName" maxlength="120" placeholder="e.g. EU GDPR Residency"></label>
+            <label class="editor-field editor-wide">Notes<textarea id="flow-notes" name="notes" rows="3" maxlength="1000" placeholder="Why was this status recorded?"></textarea></label>
+          </div>
+          <p id="flow-form-error" class="form-error" role="alert"></p>
+          <div class="dialog-actions"><button id="cancel-flow-form" class="button button-secondary" type="button">Cancel</button><button id="save-flow" class="button button-primary" type="submit">Save data flow</button></div>
+        </form>
+      </section>
+    </div>
+    <div id="tutorial-backdrop" class="dialog-backdrop tutorial-backdrop" hidden>
+      <section class="flow-dialog tutorial-dialog" role="dialog" aria-modal="true" aria-labelledby="tutorial-title" aria-describedby="tutorial-description">
+        <div class="tutorial-progress" id="tutorial-progress" aria-label="Tutorial progress"></div>
+        <div class="dialog-header">
+          <div><span id="tutorial-kicker" class="dialog-kicker">GETTING STARTED</span><h2 id="tutorial-title">Welcome to Boundary</h2></div>
+          <button id="tutorial-close" class="icon-button close-dialog" type="button" aria-label="Close tutorial">×</button>
+        </div>
+        <div class="tutorial-content">
+          <span id="tutorial-icon" class="tutorial-icon" aria-hidden="true">✦</span>
+          <p id="tutorial-description"></p>
+          <div id="tutorial-preview" class="tutorial-preview" aria-live="polite"></div>
+          <p id="tutorial-note" class="tutorial-note"></p>
+        </div>
+        <div class="tutorial-footer">
+          <button id="tutorial-skip" class="auth-back-link tutorial-skip" type="button">Skip tutorial</button>
+          <div class="tutorial-controls">
+            <button id="tutorial-previous" class="button button-secondary" type="button">Back</button>
+            <button id="tutorial-next" class="button button-primary" type="button">Next</button>
+          </div>
+        </div>
+        <p class="made-with-love made-with-love-tutorial">Made with <span aria-label="love">♥</span> by @akul &amp; @saiqua</p>
+      </section>
+    </div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
