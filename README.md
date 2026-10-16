@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:06B6D4,50:2563EB,100:7C3AED&height=190&section=header&text=Sovereign%20Eye&fontSize=48&fontColor=FFFFFF&animation=fadeIn&fontAlignY=38&desc=Residency%20Control%20Plane&descAlignY=60&descSize=18" alt="Colorful Sovereign Eye banner" width="100%" />
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:06B6D4,50:2563EB,100:7C3AED&height=190&section=header&text=Sovereign%20Eye&fontSize=48&fontColor=FFFFFF&animation=twinkling&fontAlignY=38&desc=Residency%20Control%20Plane&descAlignY=60&descSize=18" alt="Animated colorful Sovereign Eye banner" width="100%" />
 </p>
 
 <h1 align="center">Sovereign Eye</h1>
 
 <p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Inter&weight=600&size=18&duration=2800&pause=900&color=2563EB&center=true&vCenter=true&width=700&lines=Map+cloud+resources+across+jurisdictions;Review+cross-border+data+flows;Keep+provider+credentials+encrypted+server-side" alt="Animated project description" />
+  <img src="https://readme-typing-svg.demolab.com?font=Inter&weight=600&size=18&duration=2200&pause=650&color=2563EB&center=true&vCenter=true&width=760&lines=Map+cloud+resources+across+jurisdictions;Review+cross-border+data+flows;Connect+13+cloud+providers;Keep+provider+credentials+encrypted+server-side;Inventory+resources%2C+not+data+contents" alt="Animated project description" />
 </p>
 
 <p align="center">A private workspace for recording and reviewing sensitive data flows across cloud regions and jurisdictions.</p>
@@ -88,6 +88,10 @@ Sovereign Eye is a private workspace for recording and reviewing sensitive data 
 
 ## 🚀 Quick start
 
+<p align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=15&duration=1800&pause=900&color=0EA5E9&center=true&vCenter=true&width=600&lines=npm+install;npm+run+dev;Build+and+explore+Sovereign+Eye" alt="Animated quick start commands" />
+</p>
+
 1. Install dependencies:
 
    ```sh
@@ -140,6 +144,10 @@ The application uses Supabase Auth for registration, sign-in, password reset, an
 ## ☁️ Cloud providers
 
 AWS, Azure, and Google Cloud accounts store provider identifiers and use the signed-in user's Supabase OIDC token to obtain short-lived access. The ten additional providers use provider-specific API credentials, encrypted server-side before storage and decrypted only by the scan Edge Function. No AWS keys, Azure client secrets, or Google service-account keys are collected or stored.
+
+<p align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=Inter&weight=600&size=16&duration=1900&pause=700&color=7C3AED&center=true&vCenter=true&width=720&lines=AWS+%E2%80%A2+Azure+%E2%80%A2+Google+Cloud;IBM+%E2%80%A2+Oracle+%E2%80%A2+DigitalOcean+%E2%80%A2+Cloudflare;Alibaba+%E2%80%A2+Tencent+%E2%80%A2+OVHcloud;Linode+%E2%80%A2+Vultr+%E2%80%A2+Hetzner" alt="Animated list of supported cloud providers" />
+</p>
 
 | Connection type | Providers | Access |
 | --- | --- | --- |
@@ -203,3 +211,7 @@ The default database rule is a review signal based on the jurisdictions recorded
 Passwords are handled by Supabase Auth and are not stored in Sovereign Eye tables. Workspace and flow data are protected by row-level security. The browser uses only the Supabase publishable key; never place a service-role key in client configuration. Keep `.env.local` private (it is git-ignored).
 
 </details>
+
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:7C3AED,50:2563EB,100:06B6D4&height=120&section=footer&animation=twinkling" alt="Animated colorful footer" width="100%" />
+</p>
