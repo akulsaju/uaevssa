@@ -1,8 +1,45 @@
-# Sovereign Eye — Residency Control Plane
+# Sovereign Eye - Residency Control Plane
+
+> A private workspace for recording and reviewing sensitive data flows across cloud regions and jurisdictions.
+
+[![Build](https://img.shields.io/badge/build-Vite-646CFF?logo=vite&logoColor=white)](package.json)
+[![Supabase](https://img.shields.io/badge/backend-Supabase-3ECF8E?logo=supabase&logoColor=white)](supabase/)
+[![License](https://img.shields.io/badge/license-private-lightgrey)](#security-notes)
+
+### Languages and tools
+
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=111111)](app.js)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](supabase/functions/)
+[![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)](index.html)
+[![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)](styles.css)
+[![SQL](https://img.shields.io/badge/SQL-336791?logo=postgresql&logoColor=white)](supabase/migrations/)
+[![Deno](https://img.shields.io/badge/Deno-000000?logo=deno&logoColor=white)](supabase/functions/)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)](package.json)
+[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=white)](supabase/)
+
+<p align="center">
+  <a href="#what-it-does">What it does</a> ·
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#cloud-providers">Cloud providers</a> ·
+  <a href="#security-notes">Security notes</a>
+</p>
+
+<details>
+<summary><strong>Contents</strong></summary>
+
+- [What it does](#what-it-does)
+- [Technology](#technology)
+- [Quick start](#quick-start)
+- [Demo mode](#demo-mode)
+- [Authentication](#authentication-and-email)
+- [Cloud providers](#cloud-providers)
+- [Security notes](#security-notes)
+
+</details>
 
 Sovereign Eye is a private workspace for recording and reviewing sensitive data flows across cloud regions and jurisdictions. It helps teams identify inventory records that may need a closer review.
 
-## Features
+## What it does
 
 - Email/password registration and sign-in through Supabase Auth, with email confirmation required by the configured Supabase project.
 - Private workspace creation and workspace-scoped data-flow records protected by Postgres row-level security.
@@ -15,15 +52,28 @@ Sovereign Eye is a private workspace for recording and reviewing sensitive data 
 - Workspace settings for changing the workspace name.
 - Creator credit shown on the sign-in, dashboard, and tutorial screens.
 
+<details>
+<summary><strong>Feature checklist</strong></summary>
+
+| Area | Supported |
+| --- | --- |
+| Manual data-flow inventory | Create, edit, search, filter, review, delete, and export to CSV |
+| Residency review | Flags PII, financial, and sensitive flows crossing recorded jurisdictions |
+| Cloud inventory | On-demand, read-only resource discovery |
+| Classification | Reads the shared `boundary-classification` tag or label |
+| Workspace access | Workspace-scoped access controlled by Postgres RLS |
+
+</details>
+
 ## Technology
 
 - **JavaScript** powers the browser application, with **HTML** for page structure and **CSS** for styling.
 - **TypeScript** is used for the Supabase Edge Functions, which run on Deno.
 - **SQL** defines the Supabase/PostgreSQL schema, access policies, and migrations.
 - **JSON** is used for application and function configuration.
-- **Vite** builds and serves the frontend; the app uses the Supabase JavaScript client for authentication and data access.
+- **Vite** builds and serves the frontend; the app uses the [Supabase JavaScript client](https://github.com/supabase/supabase-js) for authentication and data access.
 
-## Run locally
+## Quick start
 
 1. Install dependencies:
 
@@ -48,7 +98,19 @@ Sovereign Eye is a private workspace for recording and reviewing sensitive data 
 
 Open the URL printed by Vite. To create a production build, run `npm run build`.
 
-## Demo login
+<details>
+<summary><strong>Environment variables</strong></summary>
+
+| Variable | Purpose |
+| --- | --- |
+| `VITE_SUPABASE_URL` | Supabase project URL |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Browser-safe Supabase publishable key |
+
+Never put a service-role key in `.env.local`.
+
+</details>
+
+## Demo mode
 
 Use these credentials in the sign-in form, or choose **Open read-only demo** on the login screen:
 
@@ -62,9 +124,32 @@ This is a **public, read-only demo mode**, not a Supabase account. It displays f
 
 The application uses Supabase Auth for registration, sign-in, password reset, and email-confirmation state. A user must confirm their email before the app opens their workspace when the project requires confirmation. The app includes confirmation and password-reset screens, but this repository does not configure an email provider. Delivery depends on the Supabase project's existing Auth email settings; SMTP setup and test emails are intentionally not included.
 
-## Cloud account discovery
+## Cloud providers
 
 AWS, Azure, and Google Cloud accounts store provider identifiers and use the signed-in user's Supabase OIDC token to obtain short-lived access. The ten additional providers use provider-specific API credentials, encrypted server-side before storage and decrypted only by the scan Edge Function. No AWS keys, Azure client secrets, or Google service-account keys are collected or stored.
+
+| Connection type | Providers | Access |
+| --- | --- | --- |
+| OIDC federation | AWS, Azure, Google Cloud | Short-lived, read-only access |
+| Encrypted API credentials | IBM Cloud, Oracle Cloud, DigitalOcean, Cloudflare, Alibaba Cloud, Tencent Cloud, OVHcloud, Linode, Vultr, Hetzner Cloud | Provider-specific read-only inventory APIs |
+
+<details>
+<summary><strong>Supported resource coverage</strong></summary>
+
+| Provider | Discovered resources |
+| --- | --- |
+| IBM Cloud | Resource Controller instances |
+| Oracle Cloud | Resource Search resources |
+| DigitalOcean | Droplets, managed databases, volumes |
+| Cloudflare | Workers scripts, R2 buckets |
+| Alibaba Cloud | ECS instances |
+| Tencent Cloud | CVM instances |
+| OVHcloud | Public Cloud instances |
+| Linode | Instances, volumes |
+| Vultr | Instances |
+| Hetzner Cloud | Servers |
+
+</details>
 
 Before connecting an account, configure its provider to trust the exact OIDC issuer, subject, and audience shown in the connection dialog:
 
@@ -74,7 +159,7 @@ Before connecting an account, configure its provider to trust the exact OIDC iss
 
 The required tag/label key is `boundary-classification`. A recognized value is stored as the resource's classification; other or missing values are `Unclassified`. Scans are initiated manually from the dashboard. The account creator is the only user allowed to run scans for that connection. Discovery records resource identifiers, types, names, regions, jurisdictions, and classifications; it does not read resource contents or inspect API/network traffic. A resource inventory in different countries is not evidence that data moved between them. Region-to-country mapping is best-effort and unrecognized locations are marked `UN`.
 
-The migrations in `supabase/migrations/` create the cloud inventory schema and add support for the ten additional providers. Apply them in filename order. Link the Supabase CLI to the project and deploy the functions with JWT verification enabled before using cloud scans:
+The migrations in [`supabase/migrations/`](supabase/migrations/) create the cloud inventory schema and add support for the ten additional providers. Apply them in filename order. Link the Supabase CLI to the project and deploy the functions with JWT verification enabled before using cloud scans:
 
 ```sh
 supabase functions deploy boundary-cloud-scan --project-ref <project-ref>
@@ -93,10 +178,15 @@ supabase functions deploy boundary-cloud-scan --project-ref <project-ref>
 
 The key is required by both functions. Additional provider credentials are encrypted with AES-GCM before being stored, and the ciphertext column is not readable by authenticated browser clients. Back up the key securely: if it is lost or rotated without re-encrypting saved credentials, those provider accounts must be reconnected. API credentials should be restricted to the documented read-only inventory endpoints.
 
-## Scope and security
+## Security notes
+
+<details>
+<summary><strong>Security model and limitations</strong></summary>
 
 Sovereign Eye combines a **manual data-flow inventory** with **on-demand cloud resource discovery**. Resource discovery does not automatically infer source-to-destination data flows, inspect data content, ingest audit/network logs, or block transfers.
 
 The default database rule is a review signal based on the jurisdictions recorded in each flow. It is not jurisdiction-specific legal advice, a compliance certification, or proof that data actually crossed a border. Validate the inventory and configure appropriate policies and controls before relying on it for compliance decisions.
 
 Passwords are handled by Supabase Auth and are not stored in Sovereign Eye tables. Workspace and flow data are protected by row-level security. The browser uses only the Supabase publishable key; never place a service-role key in client configuration. Keep `.env.local` private (it is git-ignored).
+
+</details>
