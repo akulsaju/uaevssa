@@ -94,7 +94,7 @@ function setAuthMode(mode) {
   document.querySelector('#password').autocomplete = isSignup || isReset ? 'new-password' : 'current-password';
   document.querySelector('#forgot-password').hidden = isSignup || isReset;
   document.querySelector('#auth-switch').hidden = isReset;
-  document.querySelector('#auth-switch-copy').textContent = isSignup ? 'Already have an account?' : 'New to Boundary?';
+  document.querySelector('#auth-switch-copy').textContent = isSignup ? 'Already have an account?' : 'New to Sovereign Eye?';
   authModeToggle.textContent = isSignup ? 'Sign in' : 'Create an account';
   authSubmit.textContent = isSignup ? 'Create account' : isReset ? 'Update password' : 'Sign in';
   authSubmit.dataset.idleText = authSubmit.textContent;
@@ -220,7 +220,7 @@ function createDemoWorkspace() {
   state.cloudAccounts = [
     {
       id: id('201'), workspace_id: state.workspace.id, provider: 'AWS', display_name: 'Demo AWS production',
-      account_identifier: '111122223333', role_arn: 'arn:aws:iam::111122223333:role/BoundaryReadOnly',
+      account_identifier: '111122223333', role_arn: 'arn:aws:iam::111122223333:role/SovereignEyeReadOnly',
       created_by: demoUser.id, created_at: recent(144)
     },
     {
@@ -322,9 +322,9 @@ function setWorkspaceError(error) {
 
 const tutorialSteps = [
   {
-    title: 'Welcome to Boundary',
+    title: 'Welcome to Sovereign Eye',
     description: 'Your private workspace helps you keep track of where sensitive information moves—and spot cross-border flows that may need a closer look.',
-    note: 'Cloud discovery reads resource configuration only. Boundary does not observe or block network traffic.',
+    note: 'Cloud discovery reads resource configuration only. Sovereign Eye does not observe or block network traffic.',
     icon: '✦',
     preview: '<div class="tutorial-welcome-preview"><span>YOUR WORKSPACE</span><strong>Map sensitive data movement.</strong><div><i>PRIVATE BY DEFAULT</i><i>BUILT FOR REVIEW</i></div></div>'
   },
@@ -354,7 +354,7 @@ const tutorialSteps = [
   },
   {
     title: 'Make your first inventory record',
-    description: 'Start with one important transfer. Choose its data classification and record both ends of the journey. Boundary saves it to your private workspace and calculates its review status.',
+    description: 'Start with one important transfer. Choose its data classification and record both ends of the journey. Sovereign Eye saves it to your private workspace and calculates its review status.',
     note: 'The data-flow inventory is manual. Cloud accounts can separately discover tagged resources and regions.',
     icon: '＋',
     preview: '<div class="tutorial-start-preview"><span>READY WHEN YOU ARE</span><strong>One flow is enough to get started.</strong><small>Usually takes less than a minute</small></div>',
@@ -930,7 +930,7 @@ function openDetails(flowId) {
       <div class="detail-item"><span>LAST UPDATED</span><strong>${escapeHtml(formatLastSeen(flow.updated_at))}</strong></div>
       <div class="detail-item detail-wide"><span>NOTES</span><strong>${escapeHtml(flow.notes || 'No notes recorded.')}</strong></div>
     </div>
-    ${flow.status === 'violation' ? `<div class="policy-message"><span class="policy-check">!</span><span><b>Cross-jurisdiction rule:</b> Sensitive data is recorded moving from ${escapeHtml(flow.source_jurisdiction)} to ${escapeHtml(flow.destination_jurisdiction)}. This finding is calculated in the database; Boundary does not block the transfer.</span></div>` : flow.status === 'at-risk' ? `<div class="policy-message"><span class="policy-check">!</span><span><b>Needs review:</b> The jurisdiction is unknown or an additional review status was recorded. This is not an automated legal compliance determination.</span></div>` : ''}
+    ${flow.status === 'violation' ? `<div class="policy-message"><span class="policy-check">!</span><span><b>Cross-jurisdiction rule:</b> Sensitive data is recorded moving from ${escapeHtml(flow.source_jurisdiction)} to ${escapeHtml(flow.destination_jurisdiction)}. This finding is calculated in the database; Sovereign Eye does not block the transfer.</span></div>` : flow.status === 'at-risk' ? `<div class="policy-message"><span class="policy-check">!</span><span><b>Needs review:</b> The jurisdiction is unknown or an additional review status was recorded. This is not an automated legal compliance determination.</span></div>` : ''}
   `;
   const reviewButton = document.querySelector('#review-flow');
   reviewButton.textContent = flow.reviewed ? 'Reviewed' : 'Mark as reviewed';
@@ -1356,7 +1356,7 @@ document.querySelector('#export-button').addEventListener('click', () => {
   const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
   const link = document.createElement('a');
   link.href = url;
-  link.download = 'boundary-data-flows.csv';
+  link.download = 'sovereign-eye-data-flows.csv';
   link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
   setToast('Filtered workspace records exported.');
