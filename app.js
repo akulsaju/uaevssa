@@ -48,6 +48,18 @@ const toast = document.querySelector('#toast');
 
 const providerClasses = { AWS: 'provider-aws', GCP: 'provider-gcp', Azure: 'provider-azure', Other: 'provider-other' };
 const providerMarks = { AWS: 'a', GCP: 'G', Azure: 'A', Other: 'O' };
+const additionalManualProviders = [
+  'IBM Cloud',
+  'Oracle Cloud',
+  'DigitalOcean',
+  'Cloudflare',
+  'Alibaba Cloud',
+  'Tencent Cloud',
+  'OVHcloud',
+  'Linode',
+  'Vultr',
+  'Hetzner Cloud'
+];
 const dataClasses = { PII: 'data-pii', Financial: 'data-financial', Internal: 'data-internal', Sensitive: 'data-sensitive', Public: 'data-internal' };
 const statusClasses = { violation: 'pill-blocked', 'at-risk': 'pill-at-risk', compliant: 'pill-compliant' };
 const statusLabels = { violation: 'Violation', 'at-risk': 'At risk', compliant: 'Compliant' };
@@ -140,6 +152,19 @@ function setBusy(button, busy, busyText) {
   button.disabled = busy;
   button.dataset.idleText ??= button.textContent;
   button.textContent = busy ? busyText : button.dataset.idleText;
+}
+
+function addManualProviderOptions() {
+  const select = document.querySelector('#flow-provider');
+  const otherOption = select?.querySelector('option[value="Other"]');
+  if (!select || !otherOption) return;
+
+  for (const provider of additionalManualProviders) {
+    const option = document.createElement('option');
+    option.value = 'Other';
+    option.textContent = `${provider} (manual)`;
+    select.insertBefore(option, otherOption);
+  }
 }
 
 function userDisplayName(user) {
@@ -1036,6 +1061,7 @@ authModeToggle.addEventListener('click', () => {
   setAuthMode(authScreen.dataset.mode === 'signup' ? 'signin' : 'signup');
 });
 
+addManualProviderOptions();
 document.querySelector('#demo-login-button').addEventListener('click', createDemoWorkspace);
 
 authForm.addEventListener('submit', async (event) => {
