@@ -15,6 +15,14 @@ Sovereign Eye is a private workspace for recording and reviewing sensitive data 
 - Workspace settings for changing the workspace name.
 - Creator credit shown on the sign-in, dashboard, and tutorial screens.
 
+## Technology
+
+- **JavaScript** powers the browser application, with **HTML** for page structure and **CSS** for styling.
+- **TypeScript** is used for the Supabase Edge Functions, which run on Deno.
+- **SQL** defines the Supabase/PostgreSQL schema, access policies, and migrations.
+- **JSON** is used for application and function configuration.
+- **Vite** builds and serves the frontend; the app uses the Supabase JavaScript client for authentication and data access.
+
 ## Run locally
 
 1. Install dependencies:
@@ -56,7 +64,7 @@ The application uses Supabase Auth for registration, sign-in, password reset, an
 
 ## Cloud account discovery
 
-Cloud accounts are connected by storing provider identifiers only. Scans run in the `boundary-cloud-scan` Supabase Edge Function using the signed-in user's Supabase OIDC token and short-lived provider credentials. No long-lived AWS keys, Azure client secrets, or Google service-account keys are collected or stored.
+AWS, Azure, and Google Cloud accounts store provider identifiers and use the signed-in user's Supabase OIDC token to obtain short-lived access. The ten additional providers use provider-specific API credentials, encrypted server-side before storage and decrypted only by the scan Edge Function. No AWS keys, Azure client secrets, or Google service-account keys are collected or stored.
 
 Before connecting an account, configure its provider to trust the exact OIDC issuer, subject, and audience shown in the connection dialog:
 
@@ -66,7 +74,7 @@ Before connecting an account, configure its provider to trust the exact OIDC iss
 
 The required tag/label key is `boundary-classification`. A recognized value is stored as the resource's classification; other or missing values are `Unclassified`. Scans are initiated manually from the dashboard. The account creator is the only user allowed to run scans for that connection. Discovery records resource identifiers, types, names, regions, jurisdictions, and classifications; it does not read resource contents or inspect API/network traffic. A resource inventory in different countries is not evidence that data moved between them. Region-to-country mapping is best-effort and unrecognized locations are marked `UN`.
 
-The Supabase migration in `supabase/migrations/20261015180000_boundary_cloud_discovery.sql` creates the cloud inventory schema. Link the Supabase CLI to the project and deploy the function with JWT verification enabled before using the scan button:
+The migrations in `supabase/migrations/` create the cloud inventory schema and add support for the ten additional providers. Apply them in filename order. Link the Supabase CLI to the project and deploy the functions with JWT verification enabled before using cloud scans:
 
 ```sh
 supabase functions deploy boundary-cloud-scan --project-ref <project-ref>
