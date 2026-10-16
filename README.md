@@ -1,21 +1,34 @@
-# Sovereign Eye - Residency Control Plane
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:06B6D4,50:2563EB,100:7C3AED&height=190&section=header&text=Sovereign%20Eye&fontSize=48&fontColor=FFFFFF&animation=twinkling&fontAlignY=38&desc=Residency%20Control%20Plane&descAlignY=60&descSize=18" alt="Animated colorful Sovereign Eye banner" width="100%" />
+</p>
 
-> A private workspace for recording and reviewing sensitive data flows across cloud regions and jurisdictions.
+<h1 align="center">Sovereign Eye</h1>
 
-[![Build](https://img.shields.io/badge/build-Vite-646CFF?logo=vite&logoColor=white)](package.json)
-[![Supabase](https://img.shields.io/badge/backend-Supabase-3ECF8E?logo=supabase&logoColor=white)](supabase/)
-[![License](https://img.shields.io/badge/license-private-lightgrey)](#security-notes)
+<p align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=Inter&weight=600&size=18&duration=2200&pause=650&color=2563EB&center=true&vCenter=true&width=760&lines=Map+cloud+resources+across+jurisdictions;Review+cross-border+data+flows;Connect+13+cloud+providers;Keep+provider+credentials+encrypted+server-side;Inventory+resources%2C+not+data+contents" alt="Animated project description" />
+</p>
 
-### Languages and tools
+<p align="center">A private workspace for recording and reviewing sensitive data flows across cloud regions and jurisdictions.</p>
 
-[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=111111)](app.js)
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](supabase/functions/)
-[![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)](index.html)
-[![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)](styles.css)
-[![SQL](https://img.shields.io/badge/SQL-336791?logo=postgresql&logoColor=white)](supabase/migrations/)
-[![Deno](https://img.shields.io/badge/Deno-000000?logo=deno&logoColor=white)](supabase/functions/)
-[![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)](package.json)
-[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=white)](supabase/)
+<p align="center">
+  <a href="package.json"><img src="https://img.shields.io/badge/built%20with-Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Built with Vite" /></a>
+  <a href="supabase/"><img src="https://img.shields.io/badge/backend-Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase backend" /></a>
+  <a href="#technology"><img src="https://img.shields.io/badge/languages-5-F97316?style=for-the-badge" alt="Five languages" /></a>
+  <a href="#security-notes"><img src="https://img.shields.io/badge/security-RLS%20%2B%20AES--GCM-8B5CF6?style=for-the-badge&logo=letsencrypt&logoColor=white" alt="Row-level security and AES-GCM" /></a>
+</p>
+
+### 🎨 Languages and tools
+
+<p>
+  <a href="app.js"><img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=111111" alt="JavaScript" /></a>
+  <a href="supabase/functions/"><img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" /></a>
+  <a href="index.html"><img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5" /></a>
+  <a href="styles.css"><img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3" /></a>
+  <a href="supabase/migrations/"><img src="https://img.shields.io/badge/SQL-336791?style=for-the-badge&logo=postgresql&logoColor=white" alt="SQL" /></a>
+  <a href="supabase/functions/"><img src="https://img.shields.io/badge/Deno-000000?style=for-the-badge&logo=deno&logoColor=white" alt="Deno" /></a>
+  <a href="package.json"><img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" /></a>
+  <a href="supabase/"><img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" /></a>
+</p>
 
 <p align="center">
   <a href="#what-it-does">What it does</a> ·
@@ -39,7 +52,7 @@
 
 Sovereign Eye is a private workspace for recording and reviewing sensitive data flows across cloud regions and jurisdictions. It helps teams identify inventory records that may need a closer review.
 
-## What it does
+## 🧭 What it does
 
 - Email/password registration and sign-in through Supabase Auth, with email confirmation required by the configured Supabase project.
 - Private workspace creation and workspace-scoped data-flow records protected by Postgres row-level security.
@@ -65,7 +78,7 @@ Sovereign Eye is a private workspace for recording and reviewing sensitive data 
 
 </details>
 
-## Technology
+## 🧰 Technology
 
 - **JavaScript** powers the browser application, with **HTML** for page structure and **CSS** for styling.
 - **TypeScript** is used for the Supabase Edge Functions, which run on Deno.
@@ -73,7 +86,11 @@ Sovereign Eye is a private workspace for recording and reviewing sensitive data 
 - **JSON** is used for application and function configuration.
 - **Vite** builds and serves the frontend; the app uses the [Supabase JavaScript client](https://github.com/supabase/supabase-js) for authentication and data access.
 
-## Quick start
+## 🚀 Quick start
+
+<p align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=15&duration=1800&pause=900&color=0EA5E9&center=true&vCenter=true&width=600&lines=npm+install;npm+run+dev;Build+and+explore+Sovereign+Eye" alt="Animated quick start commands" />
+</p>
 
 1. Install dependencies:
 
@@ -110,7 +127,7 @@ Never put a service-role key in `.env.local`.
 
 </details>
 
-## Demo mode
+## 🧪 Demo mode
 
 Use these credentials in the sign-in form, or choose **Open read-only demo** on the login screen:
 
@@ -120,13 +137,17 @@ Use these credentials in the sign-in form, or choose **Open read-only demo** on 
 
 This is a **public, read-only demo mode**, not a Supabase account. It displays fictional placeholder data in the browser, does not create a real user or save changes, and never grants access to a connected workspace. Editing, deleting, cloud scans, cloud account setup, and workspace settings are disabled in demo mode. Do not reuse these credentials for any real account.
 
-## Authentication and email
+## ✉️ Authentication and email
 
 The application uses Supabase Auth for registration, sign-in, password reset, and email-confirmation state. A user must confirm their email before the app opens their workspace when the project requires confirmation. The app includes confirmation and password-reset screens, but this repository does not configure an email provider. Delivery depends on the Supabase project's existing Auth email settings; SMTP setup and test emails are intentionally not included.
 
-## Cloud providers
+## ☁️ Cloud providers
 
 AWS, Azure, and Google Cloud accounts store provider identifiers and use the signed-in user's Supabase OIDC token to obtain short-lived access. The ten additional providers use provider-specific API credentials, encrypted server-side before storage and decrypted only by the scan Edge Function. No AWS keys, Azure client secrets, or Google service-account keys are collected or stored.
+
+<p align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=Inter&weight=600&size=16&duration=1900&pause=700&color=7C3AED&center=true&vCenter=true&width=720&lines=AWS+%E2%80%A2+Azure+%E2%80%A2+Google+Cloud;IBM+%E2%80%A2+Oracle+%E2%80%A2+DigitalOcean+%E2%80%A2+Cloudflare;Alibaba+%E2%80%A2+Tencent+%E2%80%A2+OVHcloud;Linode+%E2%80%A2+Vultr+%E2%80%A2+Hetzner" alt="Animated list of supported cloud providers" />
+</p>
 
 | Connection type | Providers | Access |
 | --- | --- | --- |
@@ -178,7 +199,7 @@ supabase functions deploy boundary-cloud-scan --project-ref <project-ref>
 
 The key is required by both functions. Additional provider credentials are encrypted with AES-GCM before being stored, and the ciphertext column is not readable by authenticated browser clients. Back up the key securely: if it is lost or rotated without re-encrypting saved credentials, those provider accounts must be reconnected. API credentials should be restricted to the documented read-only inventory endpoints.
 
-## Security notes
+## 🔐 Security notes
 
 <details>
 <summary><strong>Security model and limitations</strong></summary>
@@ -190,3 +211,7 @@ The default database rule is a review signal based on the jurisdictions recorded
 Passwords are handled by Supabase Auth and are not stored in Sovereign Eye tables. Workspace and flow data are protected by row-level security. The browser uses only the Supabase publishable key; never place a service-role key in client configuration. Keep `.env.local` private (it is git-ignored).
 
 </details>
+
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:7C3AED,50:2563EB,100:06B6D4&height=120&section=footer&animation=twinkling" alt="Animated colorful footer" width="100%" />
+</p>
