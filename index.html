@@ -218,7 +218,7 @@
         <div class="dialog-header"><div><span class="dialog-kicker">READ-ONLY FEDERATION</span><h2 id="cloud-account-title">Connect a cloud account</h2></div><button id="close-cloud-account" class="icon-button close-dialog" type="button" aria-label="Close cloud account form">×</button></div>
         <p class="cloud-setup-copy">Sovereign Eye exchanges your signed-in identity for temporary access. No cloud keys are stored. Set up the provider trust and read-only permissions below before scanning.</p>
         <div class="editor-grid">
-          <label class="editor-field">Provider<select id="cloud-provider"><option value="AWS">Amazon Web Services</option><option value="Azure">Microsoft Azure</option><option value="GCP">Google Cloud</option></select></label>
+          <label class="editor-field">Provider<select id="cloud-provider"><option value="AWS">Amazon Web Services</option><option value="Azure">Microsoft Azure</option><option value="GCP">Google Cloud</option><option value="IBM Cloud">IBM Cloud</option><option value="Oracle Cloud">Oracle Cloud Infrastructure</option><option value="DigitalOcean">DigitalOcean</option><option value="Cloudflare">Cloudflare</option><option value="Alibaba Cloud">Alibaba Cloud</option><option value="Tencent Cloud">Tencent Cloud</option><option value="OVHcloud">OVHcloud</option><option value="Linode">Linode</option><option value="Vultr">Vultr</option><option value="Hetzner Cloud">Hetzner Cloud</option></select></label>
           <label class="editor-field">Account label<input id="cloud-display-name" required maxlength="80" placeholder="e.g. Production"></label>
         </div>
         <div id="cloud-provider-fields">
@@ -238,6 +238,11 @@
             <label class="editor-field">Workload identity provider ID<input id="gcp-provider-id" placeholder="boundary-provider"></label>
             <label class="editor-field editor-wide">Read-only service account email<input id="gcp-service-account" type="email" placeholder="boundary-reader@my-project.iam.gserviceaccount.com"></label>
           </div>
+        </div>
+        <div id="additional-provider-fields" hidden>
+          <label id="additional-account-identifier-label" class="editor-field">Account or project ID<input id="additional-account-identifier" required maxlength="240"></label>
+          <div id="additional-provider-field-list" class="editor-grid"></div>
+          <p class="provider-credential-note">Credentials are encrypted on the server and are never returned to the browser after saving. Use a read-only credential with the narrowest available scope.</p>
         </div>
         <details class="cloud-federation-guide" open>
           <summary>Provider trust and read-only permission setup</summary>

@@ -9,7 +9,8 @@ Sovereign Eye is a private workspace for recording and reviewing sensitive data 
 - A five-step onboarding tutorial, available again from the `?` button.
 - Create, edit, review, and delete flow records; search and filter by status or region; inspect findings; and export the filtered records to CSV.
 - A database rule that flags PII, financial, and sensitive records when their recorded source and destination jurisdictions differ. Unknown jurisdictions are marked for review.
-- Connect AWS, Azure, and Google Cloud accounts using OIDC workload identity federation, then run read-only resource discovery on demand.
+- Connect AWS, Azure, and Google Cloud accounts using OIDC workload identity federation; connect IBM Cloud, Oracle Cloud, DigitalOcean, Cloudflare, Alibaba Cloud, Tencent Cloud, OVHcloud, Linode, Vultr, and Hetzner Cloud using provider-specific credentials encrypted server-side.
+- Run on-demand, read-only resource discovery for AWS, Azure, Google Cloud, and all ten additional providers. Provider coverage is limited to the resource types listed in the connection dialog.
 - Resource classification from the shared `boundary-classification` tag/label (`PII`, `Financial`, `Sensitive`, `Internal`, or `Public`). Untagged or unrecognized values remain `Unclassified`.
 - Workspace settings for changing the workspace name.
 - Creator credit shown on the sign-in, dashboard, and tutorial screens.
@@ -72,6 +73,17 @@ supabase functions deploy boundary-cloud-scan --project-ref <project-ref>
 ```
 
 Run `supabase login` first if the Supabase CLI is not already authenticated. Enter any access token directly in the CLI prompt; do not add it to `.env.local` or commit it.
+
+Apply all migrations, including `20261016100000_boundary_add_cloud_providers.sql`, before deploying the additional provider functions. Generate a 32-byte encryption key and store it only as a Supabase Edge Function secret:
+
+```sh
+openssl rand -base64 32
+supabase secrets set "BOUNDARY_CREDENTIAL_ENCRYPTION_KEY=<generated-key>"
+supabase functions deploy boundary-cloud-connect --project-ref <project-ref>
+supabase functions deploy boundary-cloud-scan --project-ref <project-ref>
+```
+
+The key is required by both functions. Additional provider credentials are encrypted with AES-GCM before being stored, and the ciphertext column is not readable by authenticated browser clients. Back up the key securely: if it is lost or rotated without re-encrypting saved credentials, those provider accounts must be reconnected. API credentials should be restricted to the documented read-only inventory endpoints.
 
 ## Scope and security
 

@@ -60,6 +60,69 @@ const additionalManualProviders = [
   'Vultr',
   'Hetzner Cloud'
 ];
+const additionalProviderDefinitions = {
+  'IBM Cloud': {
+    identifierLabel: 'IBM Cloud account ID',
+    fields: [
+      { key: 'api_key', label: 'IBM Cloud API key', secret: true },
+      { key: 'region', label: 'Default region', placeholder: 'us-south' }
+    ]
+  },
+  'Oracle Cloud': {
+    identifierLabel: 'Tenancy OCID',
+    fields: [
+      { key: 'user_ocid', label: 'User OCID', secret: true },
+      { key: 'fingerprint', label: 'API key fingerprint', secret: true },
+      { key: 'private_key', label: 'Private key (PEM)', secret: true, type: 'textarea' },
+      { key: 'region', label: 'Region', placeholder: 'us-ashburn-1' }
+    ]
+  },
+  DigitalOcean: {
+    identifierLabel: 'Account label',
+    fields: [{ key: 'token', label: 'Read-only API token', secret: true }]
+  },
+  Cloudflare: {
+    identifierLabel: 'Cloudflare account ID',
+    fields: [{ key: 'token', label: 'API token', secret: true }]
+  },
+  'Alibaba Cloud': {
+    identifierLabel: 'Alibaba Cloud account ID or label',
+    fields: [
+      { key: 'access_key_id', label: 'AccessKey ID', secret: true },
+      { key: 'access_key_secret', label: 'AccessKey secret', secret: true },
+      { key: 'region', label: 'ECS region ID', placeholder: 'eu-central-1' }
+    ]
+  },
+  'Tencent Cloud': {
+    identifierLabel: 'Tencent Cloud account UIN',
+    fields: [
+      { key: 'secret_id', label: 'SecretId', secret: true },
+      { key: 'secret_key', label: 'SecretKey', secret: true },
+      { key: 'region', label: 'CVM region', placeholder: 'ap-singapore' }
+    ]
+  },
+  OVHcloud: {
+    identifierLabel: 'Public Cloud project ID',
+    fields: [
+      { key: 'application_key', label: 'Application key', secret: true },
+      { key: 'application_secret', label: 'Application secret', secret: true },
+      { key: 'consumer_key', label: 'Consumer key', secret: true },
+      { key: 'endpoint', label: 'OVHcloud endpoint', type: 'select', options: ['ovh_eu', 'ovh_us', 'ovh_ca'] }
+    ]
+  },
+  Linode: {
+    identifierLabel: 'Account label',
+    fields: [{ key: 'token', label: 'Personal access token', secret: true }]
+  },
+  Vultr: {
+    identifierLabel: 'Account label',
+    fields: [{ key: 'token', label: 'API token', secret: true }]
+  },
+  'Hetzner Cloud': {
+    identifierLabel: 'Project label',
+    fields: [{ key: 'token', label: 'Read-only API token', secret: true }]
+  }
+};
 const dataClasses = { PII: 'data-pii', Financial: 'data-financial', Internal: 'data-internal', Sensitive: 'data-sensitive', Public: 'data-internal' };
 const statusClasses = { violation: 'pill-blocked', 'at-risk': 'pill-at-risk', compliant: 'pill-compliant' };
 const statusLabels = { violation: 'Violation', 'at-risk': 'At risk', compliant: 'Compliant' };
@@ -161,7 +224,7 @@ function addManualProviderOptions() {
 
   for (const provider of additionalManualProviders) {
     const option = document.createElement('option');
-    option.value = 'Other';
+    option.value = provider;
     option.textContent = `${provider} (manual)`;
     select.insertBefore(option, otherOption);
   }
@@ -748,6 +811,44 @@ function updateFederationInstructions() {
   document.querySelectorAll('[data-provider-fields]').forEach((panel) => {
     panel.hidden = panel.dataset.providerFields !== provider;
   });
+  const additionalFields = document.querySelector('#additional-provider-fields');
+  const additionalFieldList = document.querySelector('#additional-provider-field-list');
+  const additionalDefinition = additionalProviderDefinitions[provider];
+  additionalFields.hidden = !additionalDefinition;
+  additionalFieldList.replaceChildren();
+  if (additionalDefinition) {
+    document.querySelector('#additional-account-identifier-label').firstChild.textContent = `${additionalDefinition.identifierLabel} `;
+    document.querySelector('#additional-account-identifier').value = '';
+    for (const field of additionalDefinition.fields) {
+      const label = document.createElement('label');
+      label.className = 'editor-field';
+      label.append(document.createTextNode(`${field.label} `));
+      let input;
+      if (field.type === 'select') {
+        input = document.createElement('select');
+        for (const value of field.options) {
+          const option = document.createElement('option');
+          option.value = value;
+          option.textContent = value;
+          input.append(option);
+        }
+      } else if (field.type === 'textarea') {
+        input = document.createElement('textarea');
+        input.rows = 5;
+        input.spellcheck = false;
+      } else {
+        input = document.createElement('input');
+        input.type = field.secret ? 'password' : 'text';
+        input.autocomplete = 'off';
+        input.placeholder = field.placeholder || '';
+      }
+      input.required = true;
+      input.name = field.key;
+      input.dataset.providerField = field.key;
+      label.append(input);
+      additionalFieldList.append(label);
+    }
+  }
   const issuer = `${config.url}/auth/v1`;
   const subject = state.user?.id || 'Sign in to load your subject';
   const audience = 'authenticated';
@@ -757,7 +858,27 @@ function updateFederationInstructions() {
     Azure: `${common}<p>Add a federated identity credential to an Entra application with this issuer, subject, and audience. Assign the application the built-in <strong>Reader</strong> role on the subscription. Resource Graph lists resource metadata and tags; it does not inspect traffic.</p><p><a href="https://learn.microsoft.com/en-us/entra/workload-id/workload-identity-federation-create-trust-user-assigned-managed-identity" target="_blank" rel="noreferrer">Microsoft workload identity federation</a> · <a href="https://learn.microsoft.com/en-us/azure/governance/resource-graph/first-query-rest-api" target="_blank" rel="noreferrer">Azure Resource Graph API</a></p>`,
     GCP: `${common}<p>Create an OIDC workload identity pool provider for this issuer and allow audience <code>${audience}</code>; map <code>google.subject=assertion.sub</code>. Grant this subject permission to impersonate the selected service account. Grant that account <code>Cloud Asset Viewer</code> on the project and enable the Cloud Asset API.</p><p><a href="https://cloud.google.com/iam/docs/workload-identity-federation" target="_blank" rel="noreferrer">Google Workload Identity Federation</a> · <a href="https://cloud.google.com/asset-inventory/docs/reference/rest/v1/TopLevel/searchAllResources" target="_blank" rel="noreferrer">Cloud Asset Inventory API</a></p>`
   };
-  document.querySelector('#cloud-federation-instructions').innerHTML = guidance[provider];
+  const instructions = document.querySelector('#cloud-federation-instructions');
+  if (additionalDefinition) {
+    const endpoints = {
+      'IBM Cloud': 'IBM Resource Controller resource instances; assign Viewer access to the resource instances in the intended account.',
+      'Oracle Cloud': 'OCI Resource Search across the selected tenancy and region; grant a read-only policy such as inspect all-resources in the tenancy. Use an unencrypted PKCS#8 PEM API key.',
+      DigitalOcean: 'Droplets, managed databases, and volumes; create a personal access token with read-only access.',
+      Cloudflare: 'Workers scripts and R2 buckets for the selected account; use a token scoped to Workers Scripts:Read and Workers R2 Storage:Read.',
+      'Alibaba Cloud': 'ECS instances in the selected region; grant only ecs:DescribeInstances on the intended account.',
+      'Tencent Cloud': 'CVM instances in the selected region; grant only cvm:DescribeInstances on the intended account.',
+      OVHcloud: 'Public Cloud instances in the selected project; restrict the consumer key to read-only Cloud project instance endpoints.',
+      Linode: 'Compute instances and block storage volumes; issue a token with read_only scope for Linodes and Volumes.',
+      Vultr: 'Compute instances; use a token with instances:read permission.',
+      'Hetzner Cloud': 'Servers in the selected project; create a project token with Read access.'
+    };
+    instructions.textContent = `${endpoints[provider]} Credentials are encrypted before storage. Sovereign Eye records resource metadata only; coverage is limited to the resource types listed here.`;
+  } else {
+    instructions.innerHTML = guidance[provider];
+  }
+  document.querySelector('.cloud-setup-copy').textContent = additionalDefinition
+    ? 'Connect using a provider-specific read-only API credential. Credentials are encrypted server-side and never returned to the browser.'
+    : 'Sovereign Eye exchanges your signed-in identity for temporary access. No cloud keys are stored. Set up the provider trust and read-only permissions below before scanning.';
 }
 
 function openCloudAccountDialog() {
@@ -796,6 +917,65 @@ async function saveCloudAccount() {
   };
   if (!displayName || !state.workspace || !state.user) {
     errorElement.textContent = 'Enter an account label before saving.';
+    return;
+  }
+  if (additionalProviderDefinitions[provider]) {
+    const accountIdentifier = document.querySelector('#additional-account-identifier').value.trim();
+    const credentials = {};
+    const providerConfig = {};
+    for (const field of additionalProviderDefinitions[provider].fields) {
+      const value = document.querySelector(`[data-provider-field="${field.key}"]`)?.value.trim() || '';
+      if (!value || value.length > 20_000) {
+        errorElement.textContent = `Enter a valid ${field.label.toLowerCase()}.`;
+        return;
+      }
+      if (field.secret) credentials[field.key] = value;
+      else providerConfig[field.key] = value;
+    }
+    if (!accountIdentifier || accountIdentifier.length > 240) {
+      errorElement.textContent = `Enter a valid ${additionalProviderDefinitions[provider].identifierLabel.toLowerCase()}.`;
+      return;
+    }
+    if (provider === 'Cloudflare' && !/^[0-9a-f]{32}$/i.test(accountIdentifier)) {
+      errorElement.textContent = 'Cloudflare account ID must contain 32 hexadecimal characters.';
+      return;
+    }
+
+    const button = document.querySelector('#save-cloud-account');
+    setBusy(button, true, 'Saving...');
+    errorElement.textContent = '';
+    try {
+      const { data, error } = await supabase.functions.invoke('boundary-cloud-connect', {
+        body: {
+          provider,
+          workspace_id: state.workspace.id,
+          display_name: displayName,
+          account_identifier: accountIdentifier,
+          provider_config: providerConfig,
+          credentials
+        }
+      });
+      if (error) {
+        let message = error.message;
+        try {
+          const details = await error.context?.json();
+          if (details?.error) message = details.error;
+        } catch {
+          // Keep the SDK error if the response body is not JSON.
+        }
+        throw new Error(message);
+      }
+      if (data?.status !== 'connected') throw new Error(data?.error || 'Unable to save this cloud account.');
+      document.querySelectorAll('#additional-provider-fields input, #additional-provider-fields textarea, #additional-provider-fields select')
+        .forEach((field) => { field.value = ''; });
+      document.querySelector('#cloud-account-backdrop').hidden = true;
+      await loadCloudData();
+      setToast(`${provider} account connected. Start an on-demand scan when ready.`);
+    } catch (error) {
+      errorElement.textContent = error.message || 'Unable to save this cloud account.';
+    } finally {
+      setBusy(button, false, 'Saving...');
+    }
     return;
   }
   if (provider === 'AWS') {
