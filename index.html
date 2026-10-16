@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0b1117">
     <meta name="description" content="A data residency compliance dashboard for cloud data flows.">
-    <title>Boundary — Residency Control Plane</title>
+    <title>Sovereign Eye — Residency Control Plane</title>
     <link rel="stylesheet" href="styles.css">
     <script type="module" src="/app.js"></script>
   </head>
@@ -13,9 +13,9 @@
     <div id="boot-screen" class="boot-screen" role="status"><span class="boot-spinner"></span><span>Connecting to your secure workspace...</span></div>
     <main id="auth-screen" class="auth-screen" hidden>
       <section class="auth-card" aria-labelledby="auth-title">
-        <a class="brand auth-brand" href="/" aria-label="Boundary home">
+        <a class="brand auth-brand" href="/" aria-label="Sovereign Eye home">
           <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
-          <span>boundary<span class="brand-period">.</span></span>
+          <span>sovereign eye<span class="brand-period">.</span></span>
         </a>
         <div class="auth-eyebrow">DATA RESIDENCY CONTROL PLANE</div>
         <h1 id="auth-title">Create your workspace</h1>
@@ -40,19 +40,19 @@
           <p id="auth-feedback" class="auth-feedback" role="status" aria-live="polite"></p>
           <button id="auth-submit" class="button button-primary auth-submit" type="submit">Sign in</button>
         </form>
-        <p id="auth-switch" class="auth-switch"><span id="auth-switch-copy">New to Boundary?</span> <button id="auth-mode-toggle" type="button">Create an account</button></p>
+        <p id="auth-switch" class="auth-switch"><span id="auth-switch-copy">New to Sovereign Eye?</span> <button id="auth-mode-toggle" type="button">Create an account</button></p>
         <button id="demo-login-button" class="button button-secondary demo-login-button" type="button">Open read-only demo</button>
         <p class="demo-login-hint">Explore with the read-only demo: <code>demo</code> / <code>12345</code></p>
-        <p id="auth-security" class="auth-security"><span aria-hidden="true">⌑</span> Protected by Supabase Auth · Your password is never stored by Boundary</p>
+        <p id="auth-security" class="auth-security"><span aria-hidden="true">⌑</span> Protected by Supabase Auth · Your password is never stored by Sovereign Eye</p>
         <p class="made-by made-by-auth">Made by @akul &amp; @saiqua</p>
       </section>
     </main>
 
     <div id="app-shell" class="app-shell" hidden>
       <aside class="sidebar" aria-label="Main navigation">
-        <a class="brand" href="#dashboard" aria-label="Boundary home">
+        <a class="brand" href="#dashboard" aria-label="Sovereign Eye home">
           <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
-          <span>boundary<span class="brand-period">.</span></span>
+          <span>sovereign eye<span class="brand-period">.</span></span>
         </a>
 
         <div class="workspace-picker">
@@ -209,14 +209,14 @@
             </div>
             <div class="table-footer"><span id="results-count">0 records</span><span class="pagination-button">Changes sync to this workspace</span></div>
           </section>
-          <footer class="page-footer"><span><span class="footer-pulse"></span>Secure workspace connected</span><span>Boundary Residency Guard <span class="footer-version">manual inventory</span></span><span class="made-by">Made by @akul &amp; @saiqua</span></footer>
+          <footer class="page-footer"><span><span class="footer-pulse"></span>Secure workspace connected</span><span>Sovereign Eye Residency Guard <span class="footer-version">manual inventory</span></span><span class="made-by">Made by @akul &amp; @saiqua</span></footer>
         </div>
       </main>
     </div>
     <div id="cloud-account-backdrop" class="dialog-backdrop" hidden>
       <section class="flow-dialog cloud-account-dialog" role="dialog" aria-modal="true" aria-labelledby="cloud-account-title">
         <div class="dialog-header"><div><span class="dialog-kicker">READ-ONLY FEDERATION</span><h2 id="cloud-account-title">Connect a cloud account</h2></div><button id="close-cloud-account" class="icon-button close-dialog" type="button" aria-label="Close cloud account form">×</button></div>
-        <p class="cloud-setup-copy">Boundary exchanges your signed-in identity for temporary access. No cloud keys are stored. Set up the provider trust and read-only permissions below before scanning.</p>
+        <p class="cloud-setup-copy">Sovereign Eye exchanges your signed-in identity for temporary access. No cloud keys are stored. Set up the provider trust and read-only permissions below before scanning.</p>
         <div class="editor-grid">
           <label class="editor-field">Provider<select id="cloud-provider"><option value="AWS">Amazon Web Services</option><option value="Azure">Microsoft Azure</option><option value="GCP">Google Cloud</option></select></label>
           <label class="editor-field">Account label<input id="cloud-display-name" required maxlength="80" placeholder="e.g. Production"></label>
@@ -224,7 +224,7 @@
         <div id="cloud-provider-fields">
           <div class="cloud-provider-fields" data-provider-fields="AWS">
             <label class="editor-field">AWS account ID<input id="aws-account-id" inputmode="numeric" minlength="12" maxlength="12" pattern="[0-9]{12}" placeholder="12-digit account ID"></label>
-            <label class="editor-field">IAM role ARN<input id="aws-role-arn" placeholder="arn:aws:iam::123456789012:role/BoundaryReadOnly"></label>
+            <label class="editor-field">IAM role ARN<input id="aws-role-arn" placeholder="arn:aws:iam::123456789012:role/SovereignEyeReadOnly"></label>
           </div>
           <div class="cloud-provider-fields" data-provider-fields="Azure" hidden>
             <label class="editor-field">Entra tenant ID<input id="azure-tenant-id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"></label>
@@ -290,7 +290,7 @@
       <section class="flow-dialog tutorial-dialog" role="dialog" aria-modal="true" aria-labelledby="tutorial-title" aria-describedby="tutorial-description">
         <div class="tutorial-progress" id="tutorial-progress" aria-label="Tutorial progress"></div>
         <div class="dialog-header">
-          <div><span id="tutorial-kicker" class="dialog-kicker">GETTING STARTED</span><h2 id="tutorial-title">Welcome to Boundary</h2></div>
+          <div><span id="tutorial-kicker" class="dialog-kicker">GETTING STARTED</span><h2 id="tutorial-title">Welcome to Sovereign Eye</h2></div>
           <button id="tutorial-close" class="icon-button close-dialog" type="button" aria-label="Close tutorial">×</button>
         </div>
         <div class="tutorial-content">

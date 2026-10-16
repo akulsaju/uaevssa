@@ -1,6 +1,6 @@
-# Boundary — Residency Control Plane
+# Sovereign Eye — Residency Control Plane
 
-Boundary is a private workspace for recording and reviewing sensitive data flows across cloud regions and jurisdictions. It helps teams identify inventory records that may need a closer review.
+Sovereign Eye is a private workspace for recording and reviewing sensitive data flows across cloud regions and jurisdictions. It helps teams identify inventory records that may need a closer review.
 
 ## Features
 
@@ -75,8 +75,8 @@ Run `supabase login` first if the Supabase CLI is not already authenticated. Ent
 
 ## Scope and security
 
-Boundary combines a **manual data-flow inventory** with **on-demand cloud resource discovery**. Resource discovery does not automatically infer source-to-destination data flows, inspect data content, ingest audit/network logs, or block transfers.
+Sovereign Eye combines a **manual data-flow inventory** with **on-demand cloud resource discovery**. Resource discovery does not automatically infer source-to-destination data flows, inspect data content, ingest audit/network logs, or block transfers.
 
 The default database rule is a review signal based on the jurisdictions recorded in each flow. It is not jurisdiction-specific legal advice, a compliance certification, or proof that data actually crossed a border. Validate the inventory and configure appropriate policies and controls before relying on it for compliance decisions.
 
-Passwords are handled by Supabase Auth and are not stored in Boundary tables. Workspace and flow data are protected by row-level security. The browser uses only the Supabase publishable key; never place a service-role key in client configuration. Keep `.env.local` private (it is git-ignored).
+Passwords are handled by Supabase Auth and are not stored in Sovereign Eye tables. Workspace and flow data are protected by row-level security. The browser uses only the Supabase publishable key; never place a service-role key in client configuration. Keep `.env.local` private (it is git-ignored).
